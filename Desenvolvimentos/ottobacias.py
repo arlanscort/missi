@@ -5,17 +5,64 @@ import fiona
 import geopandas as gpd
 
 
-#sanepar = gpd.read_file('Bacia_de_Mananciais_Ativos.shp')
 
+#sanepar = gpd.read_file('Bacia_de_Mananciais_Ativos.shp')
 shapes = fiona.listlayers('/Users/arlan/Arquivos-Fixos/REDE_Hidrografica_OTTOCODIFICADA_PR.gdb')
 achs = shapes[0] # Areas de Contribuição Hidrográfica
-tdrs = shapes[1] # Trechos de Drenagem
-ottobacias = gpd.read_file('/Users/arlan/Arquivos-Fixos/REDE_Hidrografica_OTTOCODIFICADA_PR.gdb', \
+ottobac_IAT = gpd.read_file('/Users/arlan/Arquivos-Fixos/REDE_Hidrografica_OTTOCODIFICADA_PR.gdb', \
             layer=achs)
 
-
 # Teste para o reservatorio de Fiu
-cod_exutorio = 8642354135
+coexutorio = '8642354535'
+
+
+
+# Procedimentos
+# 1 - Encontrar a posicao do ultimo digito par contido em codigo_exutorio
+pos = 0
+for i,dig in enumerate(coexutorio):
+    if (int(dig)%2) == 0:
+        pos = i
+coesquerda = coexutorio[:(pos+1)]
+gdf1 = ottobac_IAT.loc[ottobac_IAT['cobacia'].str.startswith(coesquerda)]
+
+# 2 -
+coexutorio_dir = coexutorio[(pos+1):]
+for index, cobacia in gdf1['cobacia'].items():
+    cobacia_dir = cobacia[(pos+1):]
+
+    # 2 - Dropar as cobacias cujo primeiro digito da parte codigo a direita eh
+    # menor que o digito correspondente do codigo do exutorio
+    for pos, dig in enumerate(coexutorio_dir):
+        if int(cobacia_dir[pos]) < int(dig):
+            gdf2 = gdf1.drop([index], inplace=True)
+            break
+        if int(cobacia_dir[pos]) > int(dig):
+            break
+
+
+
+# C1 - nao tem digitos diferentes - NAO FAZ NADA (JA ESTA SELECIONADO)
+# C2 - o primeiro diferente eh maior - NAO FAZ NADA (JA ESTA SELECIONADO)
+# C3 - o primeiro diferente eh menor - DROPA
+
+
+
+
+
+
+
+
+
+
+
+# Explicacao
+# Explicar as duas condicoes
+# ...
+# Se o ultimo digito par for o ultimo digito do codigo do exutorio, significa # QUESTION:
+# a propria bacia
+
+
 
 # def eh_exutorio(codigo_exutorio, codigo_bacia):
 #     codigo_exutorio = list(codigo_exutorio)
