@@ -36,10 +36,17 @@ def ottobacias_montante(coexutorio, achs):
         return 0
     # 1
     pos = 0
+    # Avanca a posicao (pos) ate o ultimo digito par da esquerda p/ direita
     for i, dig_str in enumerate(coexutorio):
         dig = int(dig_str)
-        if ((dig%2)==0) or (dig==9):
+        if ((dig%2)==0):
             pos = i
+    # Avanca os 9s apos o ultimo digito par
+    for dig in coexutorio[pos+1:]:
+        if int(dig) == 9:
+            pos+=1
+        else:
+            break
     # 2
     gdf = achs.loc[achs['cobacia'].str.startswith(coexutorio[:(pos+1)])]
     # 3
@@ -59,5 +66,5 @@ def ottobacias_montante(coexutorio, achs):
 
 achs = gpd.read_file('/Users/arlan/Projetos/hidrografia-pr/REDE_Hidrografica_OTTOCODIFICADA_PR.gdb', layer=0)
 # tdrs = gpd.read_file('/Users/arlan/Projetos/hidrografia-pr/REDE_Hidrografica_OTTOCODIFICADA_PR.gdb', layer=1)
-coexutorio = '8642354135'
+coexutorio = '86285193'
 gdf = ottobacias_montante(coexutorio, achs)
