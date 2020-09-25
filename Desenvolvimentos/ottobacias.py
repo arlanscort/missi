@@ -31,26 +31,29 @@ import itertools as iter
 
 
 def ottobacias_montante(coexutorio, achs):
-
     if not coexutorio in achs['cobacia'].values:
         print('ERRO: coexutorio nao encontrado no shape de ACHs')
         return 0
-
+    # 1
     pos = 0
-    for i,dig in enumerate(coexutorio):
-        if (int(dig)%2) == 0:
+    for i, dig_str in enumerate(coexutorio):
+        dig = int(dig_str)
+        if ((dig%2)==0) or (dig==9):
             pos = i
-    coexutorio_esq = coexutorio[:(pos+1)]
     # 2
-    gdf = achs.loc[achs['cobacia'].str.startswith(coexutorio_esq)]
+    gdf = achs.loc[achs['cobacia'].str.startswith(coexutorio[:(pos+1)])]
     # 3
+    total = len(gdf)
+    count = 0
     for index, cobacia in gdf['cobacia'].items():
-        for i,_ in enumerate(cobacia):
+        count += 1
+        print('Processamento {:.2f} %'.format(count/total*100))
+        for i in range(pos, len(cobacia)):
             dig_bac = int(cobacia[i])
             dig_ext = int(coexutorio[i])
             if dig_bac != dig_ext:
                 if dig_bac < dig_ext:
-                    gdf.drop([index],inplace=True)
+                    gdf = gdf.drop([index], axis=0)
                 break
     return gdf
 
